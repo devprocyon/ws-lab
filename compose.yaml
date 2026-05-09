@@ -9,3 +9,35 @@ services:
       - "5000:5000"
     volumes:
       - ./apps/api/src:/app/apps/api/src
+
+  casdoor-db:
+    image: postgres:17
+    restart: always
+    user: postgres
+    environment:
+      POSTGRES_USER: ${CASDOOR_DB_USERNAME}
+      POSTGRES_PASSWORD: ${CASDOOR_DB_PASSWORD}
+      POSTGRES_DB: ${CASDOOR_DB_NAME}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - casdoor-db-data:/var/lib/postgresql/data
+
+  casdoor:
+    image: casbin/casdoor:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./infrastructure/casdoor/conf:/conf
+    depends_on:
+      casdoor-db:
+        condition: service_healthy
+
+volumes:
+  casdoor-db-data:
