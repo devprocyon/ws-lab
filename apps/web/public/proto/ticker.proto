@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package ticker;
+
+message PriceUpdate {
+  string symbol = 1;
+  string price = 2;
+  int64 timestamp = 3;
+}
