@@ -20,6 +20,18 @@ services:
     volumes:
       - ./apps/api/src:/app/apps/api/src
 
+  web:
+    build:
+      dockerfile: apps/web/Dockerfile
+      target: dev
+    environment:
+      NEXT_PUBLIC_WS_URL: ${WS_URL}
+      NEXT_PUBLIC_API_URL: ${API_URL}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web/app:/app/apps/web/app
+
   casdoor-db:
     image: postgres:17
     restart: always
