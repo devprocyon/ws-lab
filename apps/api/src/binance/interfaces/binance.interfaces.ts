@@ -1,5 +1,5 @@
+import { CasdoorUser } from '@ws-lab/shared';
 import { Socket } from 'socket.io';
-import { CasdoorUser } from 'src/auth/interfaces/casdoor.interfaces';
 
 export interface SocketData {
   user: CasdoorUser;
@@ -8,12 +8,6 @@ export interface SocketData {
 
 export interface AuthSocket extends Socket {
   data: SocketData;
-}
-
-export interface TickerData {
-  symbol: string;
-  price: string;
-  timestamp: number;
 }
 
 export interface BinanceTradeMessage {

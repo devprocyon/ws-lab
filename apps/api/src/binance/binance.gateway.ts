@@ -10,10 +10,9 @@ import {
 import { Server } from 'socket.io';
 import { Logger, OnModuleInit } from '@nestjs/common';
 import { BinanceService } from './binance.service';
-import { PROTO_PATH, WS_EVENTS } from '@ws-lab/shared';
-import { TickerData, type AuthSocket } from './interfaces/binance.interfaces';
+import { CasdoorUser, PROTO_PATH, TickerData, WS_EVENTS } from '@ws-lab/shared';
+import { type AuthSocket } from './interfaces/binance.interfaces';
 import { JwtService } from '@nestjs/jwt';
-import { CasdoorUser } from 'src/auth/interfaces/casdoor.interfaces';
 import * as protobuf from 'protobufjs';
 import * as cookie from 'cookie';
 

@@ -4,13 +4,10 @@ import {
   OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
-import {
-  BinanceTradeMessage,
-  TickerData,
-} from './interfaces/binance.interfaces';
+import { BinanceTradeMessage } from './interfaces/binance.interfaces';
 import { ConfigService } from '@nestjs/config';
 import { Subject } from 'rxjs';
-import { TRADE_STREAMS } from '@ws-lab/shared';
+import { TickerData, TRADE_STREAMS } from '@ws-lab/shared';
 import WebSocket from 'ws';
 
 @Injectable()

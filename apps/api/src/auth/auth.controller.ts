@@ -3,11 +3,15 @@ import {
   Get,
   InternalServerErrorException,
   Query,
+  Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import express from 'express';
+import { CasdoorUser } from '@ws-lab/shared';
 
 @Controller('auth')
 export class AuthController {
@@ -41,5 +45,11 @@ export class AuthController {
     } catch {
       throw new InternalServerErrorException('Casdoor Authorization error');
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('user-info')
+  getUserInfo(@Req() req: express.Request) {
+    return req['user'] as CasdoorUser;
   }
 }
