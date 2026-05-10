@@ -1,4 +1,10 @@
-export interface TokenResponse {
+export interface CasdoorUser {
+  sub: string;
+  name: string;
+  email: string;
+}
+
+export interface CasdoorToken {
   access_token: string;
   refresh_token: string;
   id_token: string;

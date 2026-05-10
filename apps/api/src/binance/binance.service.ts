@@ -4,19 +4,26 @@ import {
   OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
+import {
+  BinanceTradeMessage,
+  TickerData,
+} from './interfaces/binance.interfaces';
 import { ConfigService } from '@nestjs/config';
 import { Subject } from 'rxjs';
+import { TRADE_STREAMS } from '@ws-lab/shared';
 import WebSocket from 'ws';
-import { BinanceTradeMessage, TickerData } from './interfaces/binance.interfaces';
 
 @Injectable()
 export class BinanceService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(BinanceService.name);
+  private readonly wsUrl: string;
   private ws: WebSocket | null = null;
 
   public readonly tickerUpdates = new Subject<TickerData>();
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {
+    this.wsUrl = this.configService.getOrThrow('BINANCE_WS_URL');
+  }
 
   onModuleInit() {
     this.connectToBinance();
@@ -28,15 +35,14 @@ export class BinanceService implements OnModuleInit, OnModuleDestroy {
   }
 
   private connectToBinance() {
-    const wsUrl = this.configService.getOrThrow<string>('BINANCE_WS_URL');
-    this.ws = new WebSocket(wsUrl);
+    this.ws = new WebSocket(this.wsUrl);
 
     this.ws.on('open', () => {
       this.logger.log('Successfully connected to Binance WebSocket');
       this.subscribeToStreams();
     });
 
-    this.ws.on('message', (data: WebSocket.Data) => {
+    this.ws.on('message', (data: WebSocket.RawData) => {
       this.handleIncomingMessage(data);
     });
 
@@ -45,9 +51,7 @@ export class BinanceService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.ws.on('close', () => {
-      this.logger.warn(
-        'Binance WebSocket connection closed. Reconnecting in 5s...',
-      );
+      this.logger.warn('Binance WebSocket connection closed');
     });
   }
 
@@ -56,27 +60,18 @@ export class BinanceService implements OnModuleInit, OnModuleDestroy {
 
     const payload = {
       method: 'SUBSCRIBE',
-      params: ['btcusdt@trade', 'ethusdt@trade'],
+      params: TRADE_STREAMS,
       id: 1,
     };
 
     this.ws.send(JSON.stringify(payload));
   }
 
-  private handleIncomingMessage(data: WebSocket.Data) {
+  private handleIncomingMessage(rawData: WebSocket.RawData) {
     try {
-      let rawData: string;
-      if (typeof data === 'string') {
-        rawData = data;
-      } else if (Buffer.isBuffer(data)) {
-        rawData = data.toString('utf-8');
-      } else if (data instanceof ArrayBuffer) {
-        rawData = Buffer.from(data).toString('utf-8');
-      } else {
-        rawData = Buffer.concat(data).toString('utf-8');
-      }
+      const data = (rawData as Buffer).toString('utf-8');
 
-      const message = JSON.parse(rawData) as BinanceTradeMessage;
+      const message = JSON.parse(data) as BinanceTradeMessage;
 
       if (message.e === 'trade') {
         const update: TickerData = {

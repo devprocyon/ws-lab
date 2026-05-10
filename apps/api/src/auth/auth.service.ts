@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TokenResponse } from './interfaces/casdoor.interfaces';
+import { CasdoorToken } from './interfaces/casdoor.interfaces';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
@@ -36,8 +36,8 @@ export class AuthService {
     return `${this.casdoorExternalUrl}/login/oauth/authorize?${params.toString()}`;
   }
 
-  async exchangeCodeForToken(code: string): Promise<TokenResponse> {
-    const response = await axios.post<TokenResponse>(
+  async exchangeCodeForToken(code: string): Promise<CasdoorToken> {
+    const response = await axios.post<CasdoorToken>(
       `${this.casdoorInternalUrl}/api/login/oauth/access_token`,
       null,
       {

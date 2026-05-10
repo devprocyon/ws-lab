@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { BinanceService } from './binance.service';
 import { BinanceGateway } from './binance.gateway';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [JwtModule],
+  imports: [AuthModule],
   providers: [BinanceService, BinanceGateway],
 })
 export class BinanceModule {}
